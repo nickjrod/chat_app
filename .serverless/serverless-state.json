@@ -1,0 +1,889 @@
+{
+  "service": {
+    "service": "awswebsocketchat",
+    "serviceObject": {
+      "name": "awswebsocketchat"
+    },
+    "provider": {
+      "name": "aws",
+      "iamManagedPolicies": [
+        "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+      ],
+      "runtime": "python3.8",
+      "versionFunctions": false,
+      "region": "eu-west-1",
+      "timeout": 29,
+      "stage": "dev",
+      "variableSyntax": "\\${([^{}:]+?(?:\\(|:)(?:[^:{}][^{}]*?)?)}",
+      "compiledCloudFormationTemplate": {
+        "AWSTemplateFormatVersion": "2010-09-09",
+        "Description": "The AWS CloudFormation template for this Serverless application",
+        "Resources": {
+          "ServerlessDeploymentBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+              "BucketEncryption": {
+                "ServerSideEncryptionConfiguration": [
+                  {
+                    "ServerSideEncryptionByDefault": {
+                      "SSEAlgorithm": "AES256"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "ServerlessDeploymentBucketPolicy": {
+            "Type": "AWS::S3::BucketPolicy",
+            "Properties": {
+              "Bucket": {
+                "Ref": "ServerlessDeploymentBucket"
+              },
+              "PolicyDocument": {
+                "Statement": [
+                  {
+                    "Action": "s3:*",
+                    "Effect": "Deny",
+                    "Principal": "*",
+                    "Resource": [
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":s3:::",
+                            {
+                              "Ref": "ServerlessDeploymentBucket"
+                            },
+                            "/*"
+                          ]
+                        ]
+                      },
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":s3:::",
+                            {
+                              "Ref": "ServerlessDeploymentBucket"
+                            }
+                          ]
+                        ]
+                      }
+                    ],
+                    "Condition": {
+                      "Bool": {
+                        "aws:SecureTransport": false
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "ConnectHandlerLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/awswebsocketchat-websocket-connectHandler"
+            }
+          },
+          "DisconnectHandlerLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/awswebsocketchat-websocket-disconnectHandler"
+            }
+          },
+          "OnMessageHandlerLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/awswebsocketchat-websocket-onMessageHandler"
+            }
+          },
+          "IamRoleLambdaExecution": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+              "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Principal": {
+                      "Service": [
+                        "lambda.amazonaws.com"
+                      ]
+                    },
+                    "Action": [
+                      "sts:AssumeRole"
+                    ]
+                  }
+                ]
+              },
+              "Policies": [
+                {
+                  "PolicyName": {
+                    "Fn::Join": [
+                      "-",
+                      [
+                        "awswebsocketchat",
+                        "websocket",
+                        "lambda"
+                      ]
+                    ]
+                  },
+                  "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:CreateLogStream",
+                          "logs:CreateLogGroup"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/awswebsocketchat-websocket*:*"
+                          }
+                        ]
+                      },
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:PutLogEvents"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/awswebsocketchat-websocket*:*:*"
+                          }
+                        ]
+                      },
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "execute-api:ManageConnections"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:execute-api:*:*:*/@connections/*"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ],
+              "Path": "/",
+              "RoleName": {
+                "Fn::Join": [
+                  "-",
+                  [
+                    "awswebsocketchat",
+                    "websocket",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    "lambdaRole"
+                  ]
+                ]
+              },
+              "ManagedPolicyArns": [
+                "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+              ]
+            }
+          },
+          "PythonPackageLayerLambdaLayer": {
+            "Type": "AWS::Lambda::LayerVersion",
+            "Properties": {
+              "Content": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/awswebsocketchat/websocket/1615528364680-2021-03-12T05:52:44.680Z/pythonPackageLayer.zip"
+              },
+              "LayerName": "Python-Package-layer",
+              "Description": "Python Package layer",
+              "CompatibleRuntimes": [
+                "python3.8"
+              ]
+            }
+          },
+          "ConnectHandlerLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/awswebsocketchat/websocket/1615528364680-2021-03-12T05:52:44.680Z/connectHandler.zip"
+              },
+              "Handler": "connect_handler.handle",
+              "Runtime": "python3.8",
+              "FunctionName": "awswebsocketchat-websocket-connectHandler",
+              "MemorySize": 1024,
+              "Timeout": 29,
+              "Environment": {
+                "Variables": {
+                  "SOCKET_CONNECTIONS_TABLE_NAME": {
+                    "Fn::Sub": "socketConnections-${AWS::AccountId}-websocket"
+                  }
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              },
+              "Layers": [
+                {
+                  "Ref": "PythonPackageLayerLambdaLayer"
+                }
+              ]
+            },
+            "DependsOn": [
+              "ConnectHandlerLogGroup"
+            ]
+          },
+          "DisconnectHandlerLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/awswebsocketchat/websocket/1615528364680-2021-03-12T05:52:44.680Z/disconnectHandler.zip"
+              },
+              "Handler": "disconnect_handler.handle",
+              "Runtime": "python3.8",
+              "FunctionName": "awswebsocketchat-websocket-disconnectHandler",
+              "MemorySize": 1024,
+              "Timeout": 29,
+              "Environment": {
+                "Variables": {
+                  "SOCKET_CONNECTIONS_TABLE_NAME": {
+                    "Fn::Sub": "socketConnections-${AWS::AccountId}-websocket"
+                  }
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              },
+              "Layers": [
+                {
+                  "Ref": "PythonPackageLayerLambdaLayer"
+                }
+              ]
+            },
+            "DependsOn": [
+              "DisconnectHandlerLogGroup"
+            ]
+          },
+          "OnMessageHandlerLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/awswebsocketchat/websocket/1615528364680-2021-03-12T05:52:44.680Z/onMessageHandler.zip"
+              },
+              "Handler": "on_message_handler.handle",
+              "Runtime": "python3.8",
+              "FunctionName": "awswebsocketchat-websocket-onMessageHandler",
+              "MemorySize": 1024,
+              "Timeout": 29,
+              "Environment": {
+                "Variables": {
+                  "SOCKET_CONNECTIONS_TABLE_NAME": {
+                    "Fn::Sub": "socketConnections-${AWS::AccountId}-websocket"
+                  }
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              },
+              "Layers": [
+                {
+                  "Ref": "PythonPackageLayerLambdaLayer"
+                }
+              ]
+            },
+            "DependsOn": [
+              "OnMessageHandlerLogGroup"
+            ]
+          },
+          "WebsocketsApi": {
+            "Type": "AWS::ApiGatewayV2::Api",
+            "Properties": {
+              "Name": "websocket-awswebsocketchat-websockets",
+              "RouteSelectionExpression": "$request.body.action",
+              "Description": "Serverless Websockets",
+              "ProtocolType": "WEBSOCKET"
+            }
+          },
+          "ConnectHandlerWebsocketsIntegration": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "WebsocketsApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":apigateway:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":lambda:path/2015-03-31/functions/",
+                    {
+                      "Fn::GetAtt": [
+                        "ConnectHandlerLambdaFunction",
+                        "Arn"
+                      ]
+                    },
+                    "/invocations"
+                  ]
+                ]
+              }
+            }
+          },
+          "DisconnectHandlerWebsocketsIntegration": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "WebsocketsApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":apigateway:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":lambda:path/2015-03-31/functions/",
+                    {
+                      "Fn::GetAtt": [
+                        "DisconnectHandlerLambdaFunction",
+                        "Arn"
+                      ]
+                    },
+                    "/invocations"
+                  ]
+                ]
+              }
+            }
+          },
+          "OnMessageHandlerWebsocketsIntegration": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "WebsocketsApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":apigateway:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":lambda:path/2015-03-31/functions/",
+                    {
+                      "Fn::GetAtt": [
+                        "OnMessageHandlerLambdaFunction",
+                        "Arn"
+                      ]
+                    },
+                    "/invocations"
+                  ]
+                ]
+              }
+            }
+          },
+          "ConnectHandlerLambdaPermissionWebsockets": {
+            "Type": "AWS::Lambda::Permission",
+            "DependsOn": [
+              "WebsocketsApi",
+              "ConnectHandlerLambdaFunction"
+            ],
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "ConnectHandlerLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com"
+            }
+          },
+          "DisconnectHandlerLambdaPermissionWebsockets": {
+            "Type": "AWS::Lambda::Permission",
+            "DependsOn": [
+              "WebsocketsApi",
+              "DisconnectHandlerLambdaFunction"
+            ],
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "DisconnectHandlerLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com"
+            }
+          },
+          "OnMessageHandlerLambdaPermissionWebsockets": {
+            "Type": "AWS::Lambda::Permission",
+            "DependsOn": [
+              "WebsocketsApi",
+              "OnMessageHandlerLambdaFunction"
+            ],
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "OnMessageHandlerLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com"
+            }
+          },
+          "SconnectWebsocketsRoute": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "WebsocketsApi"
+              },
+              "RouteKey": "$connect",
+              "AuthorizationType": "NONE",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "ConnectHandlerWebsocketsIntegration"
+                    }
+                  ]
+                ]
+              }
+            }
+          },
+          "SdisconnectWebsocketsRoute": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "WebsocketsApi"
+              },
+              "RouteKey": "$disconnect",
+              "AuthorizationType": "NONE",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "DisconnectHandlerWebsocketsIntegration"
+                    }
+                  ]
+                ]
+              }
+            }
+          },
+          "onMessageWebsocketsRoute": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "WebsocketsApi"
+              },
+              "RouteKey": "onMessage",
+              "AuthorizationType": "NONE",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "OnMessageHandlerWebsocketsIntegration"
+                    }
+                  ]
+                ]
+              }
+            }
+          },
+          "WebsocketsDeploymentStage": {
+            "Type": "AWS::ApiGatewayV2::Stage",
+            "Properties": {
+              "ApiId": {
+                "Ref": "WebsocketsApi"
+              },
+              "StageName": "websocket",
+              "Description": "Serverless Websockets",
+              "DeploymentId": {
+                "Ref": "WebsocketsDeploymentkiHGkbtQjkR4aB030Al7U5Dn685gLNCTbzg6ISUeUq8"
+              }
+            }
+          },
+          "WebsocketsDeploymentkiHGkbtQjkR4aB030Al7U5Dn685gLNCTbzg6ISUeUq8": {
+            "Type": "AWS::ApiGatewayV2::Deployment",
+            "DependsOn": [
+              "SconnectWebsocketsRoute",
+              "SdisconnectWebsocketsRoute",
+              "onMessageWebsocketsRoute"
+            ],
+            "Properties": {
+              "ApiId": {
+                "Ref": "WebsocketsApi"
+              },
+              "Description": "Serverless Websockets"
+            }
+          },
+          "socketConnectionsTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "TableName": {
+                "Fn::Sub": "socketConnections-${AWS::AccountId}-websocket"
+              },
+              "AttributeDefinitions": [
+                {
+                  "AttributeName": "connectionId",
+                  "AttributeType": "S"
+                }
+              ],
+              "KeySchema": [
+                {
+                  "AttributeName": "connectionId",
+                  "KeyType": "HASH"
+                }
+              ],
+              "BillingMode": "PAY_PER_REQUEST",
+              "SSESpecification": {
+                "SSEEnabled": true
+              }
+            }
+          }
+        },
+        "Outputs": {
+          "ServerlessDeploymentBucketName": {
+            "Value": {
+              "Ref": "ServerlessDeploymentBucket"
+            }
+          },
+          "PythonPackageLayerLambdaLayerQualifiedArn": {
+            "Description": "Current Lambda layer version",
+            "Value": {
+              "Ref": "PythonPackageLayerLambdaLayer"
+            }
+          },
+          "PythonPackageLayerLambdaLayerHash": {
+            "Description": "Current Lambda layer hash",
+            "Value": "914591048ef02357753477edc61ef963ee059b07"
+          },
+          "PythonPackageLayerLambdaLayerS3Key": {
+            "Description": "Current Lambda layer S3Key",
+            "Value": "serverless/awswebsocketchat/websocket/1615528364680-2021-03-12T05:52:44.680Z/pythonPackageLayer.zip"
+          },
+          "ServiceEndpointWebsocket": {
+            "Description": "URL of the service endpoint",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  "wss://",
+                  {
+                    "Ref": "WebsocketsApi"
+                  },
+                  ".execute-api.",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ".",
+                  {
+                    "Ref": "AWS::URLSuffix"
+                  },
+                  "/websocket"
+                ]
+              ]
+            }
+          }
+        }
+      },
+      "coreCloudFormationTemplate": {
+        "AWSTemplateFormatVersion": "2010-09-09",
+        "Description": "The AWS CloudFormation template for this Serverless application",
+        "Resources": {
+          "ServerlessDeploymentBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+              "BucketEncryption": {
+                "ServerSideEncryptionConfiguration": [
+                  {
+                    "ServerSideEncryptionByDefault": {
+                      "SSEAlgorithm": "AES256"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "ServerlessDeploymentBucketPolicy": {
+            "Type": "AWS::S3::BucketPolicy",
+            "Properties": {
+              "Bucket": {
+                "Ref": "ServerlessDeploymentBucket"
+              },
+              "PolicyDocument": {
+                "Statement": [
+                  {
+                    "Action": "s3:*",
+                    "Effect": "Deny",
+                    "Principal": "*",
+                    "Resource": [
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":s3:::",
+                            {
+                              "Ref": "ServerlessDeploymentBucket"
+                            },
+                            "/*"
+                          ]
+                        ]
+                      },
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":s3:::",
+                            {
+                              "Ref": "ServerlessDeploymentBucket"
+                            }
+                          ]
+                        ]
+                      }
+                    ],
+                    "Condition": {
+                      "Bool": {
+                        "aws:SecureTransport": false
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "Outputs": {
+          "ServerlessDeploymentBucketName": {
+            "Value": {
+              "Ref": "ServerlessDeploymentBucket"
+            }
+          }
+        }
+      },
+      "vpc": {}
+    },
+    "custom": {
+      "currentStage": "websocket",
+      "lambdaRunTime": "python3.8",
+      "socketConnectionsTableName": "socketConnections-#{AWS::AccountId}-websocket"
+    },
+    "plugins": [
+      "serverless-pseudo-parameters"
+    ],
+    "pluginsData": {},
+    "functions": {
+      "connectHandler": {
+        "handler": "connect_handler.handle",
+        "events": [
+          {
+            "websocket": "$connect"
+          }
+        ],
+        "layers": {
+          "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"ConnectHandlerLambdaFunction\"][\"Properties\"][\"Layers\"]"
+        },
+        "environment": {
+          "SOCKET_CONNECTIONS_TABLE_NAME": "socketConnections-#{AWS::AccountId}-websocket"
+        },
+        "name": "awswebsocketchat-websocket-connectHandler",
+        "package": {
+          "artifact": "/Users/nickrodriguez/Desktop/chat_app/.serverless/connectHandler.zip"
+        },
+        "memory": 1024,
+        "timeout": 29,
+        "runtime": "python3.8",
+        "vpc": {}
+      },
+      "disconnectHandler": {
+        "handler": "disconnect_handler.handle",
+        "events": [
+          {
+            "websocket": "$disconnect"
+          }
+        ],
+        "layers": {
+          "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"DisconnectHandlerLambdaFunction\"][\"Properties\"][\"Layers\"]"
+        },
+        "environment": {
+          "SOCKET_CONNECTIONS_TABLE_NAME": "socketConnections-#{AWS::AccountId}-websocket"
+        },
+        "name": "awswebsocketchat-websocket-disconnectHandler",
+        "package": {
+          "artifact": "/Users/nickrodriguez/Desktop/chat_app/.serverless/disconnectHandler.zip"
+        },
+        "memory": 1024,
+        "timeout": 29,
+        "runtime": "python3.8",
+        "vpc": {}
+      },
+      "onMessageHandler": {
+        "handler": "on_message_handler.handle",
+        "events": [
+          {
+            "websocket": {
+              "route": "onMessage"
+            }
+          }
+        ],
+        "layers": {
+          "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"OnMessageHandlerLambdaFunction\"][\"Properties\"][\"Layers\"]"
+        },
+        "environment": {
+          "SOCKET_CONNECTIONS_TABLE_NAME": "socketConnections-#{AWS::AccountId}-websocket"
+        },
+        "name": "awswebsocketchat-websocket-onMessageHandler",
+        "package": {
+          "artifact": "/Users/nickrodriguez/Desktop/chat_app/.serverless/onMessageHandler.zip"
+        },
+        "memory": 1024,
+        "timeout": 29,
+        "runtime": "python3.8",
+        "vpc": {}
+      }
+    },
+    "resources": {
+      "Resources": {
+        "socketConnectionsTable": {
+          "Type": "AWS::DynamoDB::Table",
+          "DeletionPolicy": "Retain",
+          "Properties": {
+            "TableName": "socketConnections-#{AWS::AccountId}-websocket",
+            "AttributeDefinitions": [
+              {
+                "AttributeName": "connectionId",
+                "AttributeType": "S"
+              }
+            ],
+            "KeySchema": [
+              {
+                "AttributeName": "connectionId",
+                "KeyType": "HASH"
+              }
+            ],
+            "BillingMode": "PAY_PER_REQUEST",
+            "SSESpecification": {
+              "SSEEnabled": true
+            }
+          }
+        }
+      },
+      "Outputs": {}
+    },
+    "configValidationMode": "warn",
+    "serviceFilename": "serverless.yml",
+    "layers": {
+      "pythonPackageLayer": {
+        "path": "lib",
+        "name": "Python-Package-layer",
+        "description": "Python Package layer",
+        "compatibleRuntimes": {
+          "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"PythonPackageLayerLambdaLayer\"][\"Properties\"][\"CompatibleRuntimes\"]"
+        },
+        "package": {
+          "artifact": "/Users/nickrodriguez/Desktop/chat_app/.serverless/pythonPackageLayer.zip"
+        }
+      }
+    },
+    "initialServerlessConfig": {
+      "service": {
+        "$ref": "$[\"service\"][\"serviceObject\"]"
+      },
+      "frameworkVersion": "2.15.0",
+      "custom": {
+        "$ref": "$[\"service\"][\"custom\"]"
+      },
+      "provider": {
+        "$ref": "$[\"service\"][\"provider\"]"
+      },
+      "plugins": {
+        "$ref": "$[\"service\"][\"plugins\"]"
+      },
+      "package": {
+        "individually": true,
+        "exclude": [
+          "lib/**",
+          "node_modules/**"
+        ],
+        "artifactDirectoryName": "serverless/awswebsocketchat/websocket/1615528364680-2021-03-12T05:52:44.680Z"
+      },
+      "layers": {
+        "$ref": "$[\"service\"][\"layers\"]"
+      },
+      "functions": {
+        "$ref": "$[\"service\"][\"functions\"]"
+      },
+      "resources": {
+        "$ref": "$[\"service\"][\"resources\"]"
+      }
+    },
+    "isDashboardMonitoringPreconfigured": false
+  },
+  "package": {
+    "individually": true,
+    "artifactDirectoryName": "serverless/awswebsocketchat/websocket/1615528364680-2021-03-12T05:52:44.680Z",
+    "artifact": ""
+  }
+}
