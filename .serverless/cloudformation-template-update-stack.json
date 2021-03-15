@@ -187,7 +187,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/awswebsocketchat/websocket/1615528364680-2021-03-12T05:52:44.680Z/pythonPackageLayer.zip"
+          "S3Key": "serverless/awswebsocketchat/websocket/1608093727547-2020-12-16T04:42:07.547Z/pythonPackageLayer.zip"
         },
         "LayerName": "Python-Package-layer",
         "Description": "Python Package layer",
@@ -203,7 +203,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/awswebsocketchat/websocket/1615528364680-2021-03-12T05:52:44.680Z/connectHandler.zip"
+          "S3Key": "serverless/awswebsocketchat/websocket/1615769075068-2021-03-15T00:44:35.068Z/connectHandler.zip"
         },
         "Handler": "connect_handler.handle",
         "Runtime": "python3.8",
@@ -240,7 +240,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/awswebsocketchat/websocket/1615528364680-2021-03-12T05:52:44.680Z/disconnectHandler.zip"
+          "S3Key": "serverless/awswebsocketchat/websocket/1615769075068-2021-03-15T00:44:35.068Z/disconnectHandler.zip"
         },
         "Handler": "disconnect_handler.handle",
         "Runtime": "python3.8",
@@ -277,7 +277,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/awswebsocketchat/websocket/1615528364680-2021-03-12T05:52:44.680Z/onMessageHandler.zip"
+          "S3Key": "serverless/awswebsocketchat/websocket/1615769075068-2021-03-15T00:44:35.068Z/onMessageHandler.zip"
         },
         "Handler": "on_message_handler.handle",
         "Runtime": "python3.8",
@@ -564,6 +564,10 @@
           {
             "AttributeName": "connectionId",
             "AttributeType": "S"
+          },
+          {
+            "AttributeName": "username",
+            "AttributeType": "S"
           }
         ],
         "KeySchema": [
@@ -597,7 +601,7 @@
     },
     "PythonPackageLayerLambdaLayerS3Key": {
       "Description": "Current Lambda layer S3Key",
-      "Value": "serverless/awswebsocketchat/websocket/1615528364680-2021-03-12T05:52:44.680Z/pythonPackageLayer.zip"
+      "Value": "serverless/awswebsocketchat/websocket/1608093727547-2020-12-16T04:42:07.547Z/pythonPackageLayer.zip"
     },
     "ServiceEndpointWebsocket": {
       "Description": "URL of the service endpoint",
