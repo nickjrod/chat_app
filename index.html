@@ -11,6 +11,7 @@
 </body>
 
 <input id="webSocketConnection" type="text" size="80" value="WEBSOCKET_ENDPOINT_URL"><br/><br/>
+<input id="usernameInput" type="text" size="80" placeholder="Choose your username"><br/><br/>
 <input id="messageInput" type="text" size="80" placeholder="Enter message to send"><br/><br/>
 <button id="connectToWebSocketButton" onclick="connectToWebSocket()">Connect</button> <button id="disconnectButton" onclick="disconnect()">Disconnect</button> <button id="sendMessageButton" onclick="sendMessage()">Send</button><br/>
 <p id="socketState"></p>
@@ -34,11 +35,10 @@ Socket Messages:
 
     function connectToWebSocket(){
         webSocketConnection = document.getElementById("webSocketConnection").value;
-        socket = new WebSocket(webSocketConnection);
-
+        webSocketConnectionParams = webSocketConnection + '?username=' + document.getElementById("usernameInput").value
+        socket = new WebSocket(webSocketConnectionParams);
         socket.onopen = function(event) {
             document.getElementById("socketState").innerHTML = 'Connection Open';
-
             document.getElementById("connectToWebSocketButton").disabled = true;
             document.getElementById("disconnectButton").disabled = false;
             document.getElementById("sendMessageButton").disabled = false;
