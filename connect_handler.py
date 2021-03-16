@@ -7,8 +7,6 @@ dynamodb = boto3.client('dynamodb')
 
 
 def handle(event, context):
-    print(f'## EVENT: {event} ##')
-    print(f'## CONTEXT: {context} ##')
     connectionId = event['requestContext']['connectionId']
     username = event['queryStringParameters'].get('username', '')
     item = {'connectionId': {'S': connectionId}, 'username': {'S': username}}

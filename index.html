@@ -28,8 +28,11 @@ Socket Messages:
     var socket = null;
 
     function sendMessage(){
-        payload = { "action": "onMessage", "message": document.getElementById("messageInput").value };
-
+        payload = { "action": "onMessage",
+                    "message": document.getElementById("messageInput").value,
+                    "username": document.getElementById("usernameInput").value
+                    };
+        document.getElementById('messageInput').value = "";
         socket.send(JSON.stringify(payload));
     }
 
@@ -40,6 +43,7 @@ Socket Messages:
         socket.onopen = function(event) {
             document.getElementById("socketState").innerHTML = 'Connection Open';
             document.getElementById("connectToWebSocketButton").disabled = true;
+            document.getElementById("usernameInput").disabled = true;
             document.getElementById("disconnectButton").disabled = false;
             document.getElementById("sendMessageButton").disabled = false;
         };
@@ -55,7 +59,7 @@ Socket Messages:
 
         socket.onclose = function(event) {
             document.getElementById("socketState").innerHTML = 'Connection Closed';
-
+            document.getElementById("usernameInput").disabled = false;
             document.getElementById("connectToWebSocketButton").disabled = false;
             document.getElementById("disconnectButton").disabled = true;
             document.getElementById("sendMessageButton").disabled = true;
