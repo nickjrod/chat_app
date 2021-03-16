@@ -7,7 +7,8 @@ dynamodb = boto3.client('dynamodb')
 
 def handle(event, context):
 	message = json.loads(event['body'])['message']
-
+	username = json.loads(event['body'])['username']
+	full_message = f'{username} : {message}'
 	paginator = dynamodb.get_paginator('scan')
 
 	connectionIds = []
@@ -22,7 +23,7 @@ def handle(event, context):
 	# Emit the recieved message to all the connected devices
 	for connectionId in connectionIds:
 		apigatewaymanagementapi.post_to_connection(
-			Data=message,
+			Data=full_message,
 			ConnectionId=connectionId['connectionId']['S']
 		)
 
