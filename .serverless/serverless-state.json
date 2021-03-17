@@ -220,7 +220,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/awswebsocketchat/websocket/1615869859124-2021-03-16T04:44:19.124Z/connectHandler.zip"
+                "S3Key": "serverless/awswebsocketchat/websocket/1615953076311-2021-03-17T03:51:16.311Z/connectHandler.zip"
               },
               "Handler": "connect_handler.handle",
               "Runtime": "python3.8",
@@ -257,7 +257,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/awswebsocketchat/websocket/1615869859124-2021-03-16T04:44:19.124Z/disconnectHandler.zip"
+                "S3Key": "serverless/awswebsocketchat/websocket/1615953076311-2021-03-17T03:51:16.311Z/disconnectHandler.zip"
               },
               "Handler": "disconnect_handler.handle",
               "Runtime": "python3.8",
@@ -294,7 +294,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/awswebsocketchat/websocket/1615869859124-2021-03-16T04:44:19.124Z/onMessageHandler.zip"
+                "S3Key": "serverless/awswebsocketchat/websocket/1615953076311-2021-03-17T03:51:16.311Z/onMessageHandler.zip"
               },
               "Handler": "on_message_handler.handle",
               "Runtime": "python3.8",
@@ -876,7 +876,7 @@
           "lib/**",
           "node_modules/**"
         ],
-        "artifactDirectoryName": "serverless/awswebsocketchat/websocket/1615869859124-2021-03-16T04:44:19.124Z"
+        "artifactDirectoryName": "serverless/awswebsocketchat/websocket/1615953076311-2021-03-17T03:51:16.311Z"
       },
       "layers": {
         "$ref": "$[\"service\"][\"layers\"]"
@@ -892,7 +892,7 @@
   },
   "package": {
     "individually": true,
-    "artifactDirectoryName": "serverless/awswebsocketchat/websocket/1615869859124-2021-03-16T04:44:19.124Z",
+    "artifactDirectoryName": "serverless/awswebsocketchat/websocket/1615953076311-2021-03-17T03:51:16.311Z",
     "artifact": ""
   }
 }
